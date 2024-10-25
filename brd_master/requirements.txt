@@ -1,0 +1,15 @@
+pandas
+flask
+pypandoc
+google-generativeai
+python-docx 
+Pillow
+spire.doc
+python-docx==0.8.11
+pymupdf
+boto3
+langchain_community
+python-dotenv
+streamlit
+aiohttp
+prometheus-client
