@@ -1,0 +1,38 @@
+/* Apply styles to the main content area only */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f0f2f6;
+}
+
+/* Target headers inside the main content area */
+.main-content h1, .main-content h2, .main-content h3, .main-content h4, .main-content h5, .main-content h6 {
+    color: white;  /* Change heading colors to white */
+    text-align: center;
+}
+
+/* Style buttons */
+.stButton>button {
+    background-color: #4b9cd3;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+}
+
+/* Style textarea */
+.stTextArea textarea {
+    font-size: 14px;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+/* Style select boxes */
+.stSelectbox select {
+    padding: 10px;
+    border-radius: 5px;
+}
+
+/* Sidebar-specific CSS to avoid applying the global heading styles */
+.sidebar-content h1, .sidebar-content h2, .sidebar-content h3, .sidebar-content h4, .sidebar-content h5, .sidebar-content h6 {
+    text-align: left;  /* Ensure sidebar titles are left-aligned */
+}
