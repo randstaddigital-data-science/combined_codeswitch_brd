@@ -6,7 +6,7 @@ import ast, boto3
 import requests
 from langchain_community.llms import Bedrock
 from dotenv import load_dotenv
-from Code_switch.prompts import get_conversion_prompt, get_documentation_prompt
+from code_switch.prompts import get_conversion_prompt, get_documentation_prompt
 
 load_dotenv()
 
