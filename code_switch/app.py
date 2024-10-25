@@ -9,7 +9,7 @@ def main():
         with open(file_name) as f:
             st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-    local_css("Code_switch/style.css")
+    local_css("code_switch/style.css")
 
     # Add header section with image and description
     header_col1, header_col2 = st.columns([1, 2])
