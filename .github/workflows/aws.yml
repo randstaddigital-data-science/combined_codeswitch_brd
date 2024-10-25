@@ -1,14 +1,11 @@
 name: workflow
-
 on:
   push:
     branches:
       - main
     paths-ignore:
       - 'README.md'
-
 permissions:
-  id-token: write
   contents: read
 
 jobs:
@@ -18,48 +15,36 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
-
-      - name: Lint Code
+      - name: Lint code
         run: echo "Linting repository"
-
-      - name: Run Unit Tests
+      - name: Run unit tests
         run: echo "Running unit tests"
 
   deploy-to-ec2:
-    name: Continuous Deployment to EC2
+    name: Deploy to EC2
     needs: integration
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
-
-      - name: Install SSH Key
-        uses: webfactory/ssh-agent@v0.5.3
+        
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
         with:
-          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
-
-      - name: Transfer Files to EC2
-        env:
-          EC2_PUBLIC_IP: ${{ secrets.EC2_PUBLIC_IP }}
-          EC2_USER: ${{ secrets.EC2_USER }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          
+      - name: Sync repository to EC2
         run: |
-          # Use rsync to copy the files to the EC2 instance
-          rsync -avz -e "ssh -o StrictHostKeyChecking=no" ./ $EC2_USER@$EC2_PUBLIC_IP:/home/$EC2_USER/project-directory
-
-      - name: Run Remote Commands on EC2
-        env:
-          EC2_PUBLIC_IP: ${{ secrets.EC2_PUBLIC_IP }}
-          EC2_USER: ${{ secrets.EC2_USER }}
-        run: |
-          ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_PUBLIC_IP << 'EOF'
-            # Navigate to project directory
-            cd /home/$EC2_USER/project-directory
-
-            # Install dependencies and run any necessary setup
-            python3 -m venv venv
-            source venv/bin/activate
-            pip install -r requirements.txt
-
-            # Start the application (replace with your actual start command)
-            nohup python3 app.py > app.log 2>&1 &
-          EOF
+          # Create backup of existing code (optional)
+          timestamp=$(date +%Y%m%d_%H%M%S)
+          if [ -d "/path/to/your/app" ]; then
+            cp -r /path/to/your/app "/path/to/your/app_backup_${timestamp}"
+          fi
+          
+          # Sync new code to application directory
+          rsync -av --exclude '.git' --exclude '.github' ./ /path/to/your/app/
+          
+          # Set proper permissions (adjust as needed)
+          chmod -R 755 /path/to/your/app
