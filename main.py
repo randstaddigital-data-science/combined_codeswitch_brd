@@ -3,7 +3,7 @@ from brd_master.app import run as run_brd
 from code_switch.app import main as run_codeswitch
 
 st.set_page_config(
-    page_title="Combined App",
+    page_title="Combined_codeswitch_brd",
     layout="wide",
     initial_sidebar_state="expanded"
 )
