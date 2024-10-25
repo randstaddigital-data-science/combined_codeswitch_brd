@@ -17,7 +17,6 @@ def main():
     with header_col1:
         st.image(
             "./Images/Code_Conversion_Design.jpeg",  # Replace with your actual image path
-            # caption="Code Switch",
             use_column_width=True
         )
 
@@ -38,7 +37,6 @@ With **Code Switch**, you can easily translate your code while maintaining accur
 **Code Switch** simplifies complex coding tasks, allowing you to focus on innovation rather than manual translation. 
 
 Simply upload or paste your code below to get started!
-
         """)
 
     # Add a separator
@@ -94,21 +92,24 @@ Simply upload or paste your code below to get started!
                     )
 
         if st.session_state.converted_code:
-            # Add some spacing
             st.markdown("###")
-            
-            col3, col4 = st.columns(2)
-            with col3:
-                if st.button("Evaluate Code (Python & Java only)"):
-                    with st.spinner("Checking Syntax....."):
-                        syntax_output = check_syntax(
-                            st.session_state.converted_code, target_language
-                        )
-                        st.session_state.syntax_result = (
-                            f"Syntax Check Output:\n{syntax_output}"
-                        )
-            
-            with col4:
+
+            # Syntax check button
+            if st.button("Evaluate Code (Python & Java only)"):
+                with st.spinner("Checking Syntax....."):
+                    syntax_output = check_syntax(
+                        st.session_state.converted_code, target_language
+                    )
+                    st.session_state.syntax_result = (
+                        f"Syntax Check Output:\n{syntax_output}"
+                    )
+
+            # Display Syntax Check Result
+            if st.session_state.syntax_result:
+                st.subheader("Syntax Check Result:")
+                st.write(st.session_state.syntax_result)
+
+                # Generate Explanation button appears after syntax result
                 if st.button("Generate Explanation"):
                     with st.spinner("Generating..."):
                         documentation = generate_documentation(
@@ -116,17 +117,13 @@ Simply upload or paste your code below to get started!
                         )
                         st.session_state.documentation = documentation
 
-            if st.session_state.syntax_result:
-                st.subheader("\nSyntax Check Result:")
-                st.write(st.session_state.syntax_result)
-
+        # Display Code Explanation
         if st.session_state.documentation:
             st.subheader("Code Explanation:")
-            st.markdown("""
-            <div style="background-color: #f0f2f6; padding: 20px; border-radius: 10px;">
-            """, unsafe_allow_html=True)
-            st.write(st.session_state.documentation)
-            st.markdown("</div>", unsafe_allow_html=True)
+            st.markdown(
+                f"<div style='background-color: #f0f2f6; padding: 20px; border-radius: 10px;'>{st.session_state.documentation}</div>",
+                unsafe_allow_html=True
+            )
 
 if __name__ == "__main__":
     main()
