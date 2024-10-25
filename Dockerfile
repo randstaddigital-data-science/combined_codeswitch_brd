@@ -5,6 +5,7 @@ WORKDIR /app
 
 # Copy the requirements file and install dependencies
 COPY . .
+
 RUN pip install -r requirements.txt
 # Expose the port that the Streamlit app will run on
 EXPOSE 8501
