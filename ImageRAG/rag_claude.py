@@ -6,9 +6,6 @@ import os
 from dotenv import load_dotenv
 import base64
 from io import BytesIO
-from functools import lru_cache
-import botocore.exceptions
-import time
 
 load_dotenv()  # Load environment variables from .env file
 
@@ -29,7 +26,6 @@ class RAGClaudeProcessor:
         # Load the RAG engine model
         self.rag_engine = RAGMultiModalModel.from_pretrained("vidore/colpali")
 
-    @lru_cache(maxsize=10)
     def index_pdf(self, pdf_path):
         if self.indexed_pdf != pdf_path:
             # Reinitialize the RAG engine to reset the index
@@ -57,14 +53,18 @@ class RAGClaudeProcessor:
             raise ValueError("No results found from the RAG search.")
 
         # Safely access 'content' as an attribute
-        rag_context = "\n".join([getattr(result, 'content', 'No content available') for result in results])
-
+        try:
+            rag_context = "\n".join([getattr(result, 'content', 'No content available') for result in results])
+        except AttributeError:
+            raise AttributeError("The 'content' attribute is not available in the results.")
         # Ensure results contain a valid page number
+        if not hasattr(results[0], "page_num"):
+            raise AttributeError("Expected attribute 'page_num' not found in the first result.")
+
         image_index = getattr(results[0], "page_num", 1) - 1  # Default to first page if 'page_num' is missing
         if image_index >= len(self.pdf_images) or image_index < 0:
             raise IndexError("Invalid page number returned from RAG search.")
-
-        # Construct prompt with RAG results
+        
         full_prompt = f"""
         You are tasked with answering a query strictly based on the content from the uploaded document. The document provides specific technical information and context, and your response must consider all relevant details, specifications, and technicalities mentioned.
 
@@ -82,9 +82,9 @@ class RAGClaudeProcessor:
         """
 
         # Query Claude with the constructed prompt and relevant image
-        return self.query_claude_with_retry(full_prompt, self.pdf_images[image_index])
-
-    def query_claude_with_retry(self, prompt, image, retries=3, delay=2):
+        return self.query_claude(full_prompt, self.pdf_images[image_index])
+    
+    def query_claude(self, prompt, image):
         # Convert image to base64
         buffered = BytesIO()
         image.save(buffered, format="PNG")
@@ -114,19 +114,15 @@ class RAGClaudeProcessor:
                 }
             ]
         }
-
-        for attempt in range(retries):
-            try:
-                # Make the API call to AWS Bedrock
-                response = self.bedrock.invoke_model(
-                    modelId='anthropic.claude-3-5-sonnet-20240620-v1:0',
-                    body=json.dumps(payload)
-                )
-                # Parse and return the response
-                response_body = json.loads(response['body'].read())
-                return response_body['content'][0]['text']
-            except botocore.exceptions.ClientError as e:
-                if attempt < retries - 1:
-                    time.sleep(delay)
-                else:
-                    raise RuntimeError(f"Error while querying Claude: {e}")
+        try:
+            # Make the API call to AWS Bedrock
+            response = self.bedrock.invoke_model(
+                modelId='anthropic.claude-3-5-sonnet-20240620-v1:0',
+                body=json.dumps(payload)
+            )
+            # Parse and return the response
+            response_body = json.loads(response['body'].read())
+            return response_body['content'][0]['text']
+        except Exception as e:
+            # Log or handle the error
+            raise RuntimeError(f"Error while querying Claude: {e}")
