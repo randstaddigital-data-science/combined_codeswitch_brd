@@ -4,22 +4,18 @@
 import streamlit as st
 import os
 from ImageRAG.rag_claude import RAGClaudeProcessor
-
+@st.cache_resource
 # Initialize the RAGClaudeProcessor
 def main():
-    @st.cache_resource
     def get_processor():
         return RAGClaudeProcessor()
-
     processor = get_processor()
-
     st.title("PDF Analysis with RAG and Claude")
     # Ensure the 'uploads' directory exists
     if not os.path.exists("uploads"):
         os.makedirs("uploads")
     # File uploader
     uploaded_file = st.file_uploader("Choose a PDF file", type="pdf")
-
     if uploaded_file is not None:
         # Save the uploaded file
         pdf_path = os.path.join("uploads", uploaded_file.name)
@@ -40,7 +36,6 @@ def main():
                 st.write(result)
             else:
                 st.warning("Please enter a query.")
-
     # Clean up: remove uploaded files when the app is closed
     import atexit
     def cleanup():
