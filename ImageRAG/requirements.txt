@@ -1,0 +1,11 @@
+torch
+byaldi
+accelerate
+# flash-attn
+# qwen_vl_utils
+pdf2image
+python-dotenv
+streamlit
+boto3
+PyPDF
+colpali_engine
