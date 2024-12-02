@@ -1,6 +1,6 @@
 import streamlit as st
 from brd_master.app import run as run_brd
-from Code_switch.app import main as run_codeswitch
+from code_switch.app import main as run_codeswitch
 from ImageRAG.app import main as run_imagerag  # Import the main function from ImageRAG
 
 st.set_page_config(
