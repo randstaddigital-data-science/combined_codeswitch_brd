@@ -4,9 +4,10 @@
 import streamlit as st
 import os
 from ImageRAG.rag_claude import RAGClaudeProcessor
-@st.cache_resource
+
 # Initialize the RAGClaudeProcessor
 def main():
+    @st.cache_resource
     def get_processor():
         return RAGClaudeProcessor()
     processor = get_processor()
