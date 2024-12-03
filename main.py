@@ -1,7 +1,10 @@
 import streamlit as st
 from brd_master.app import run as run_brd
-from code_switch.app import main as run_codeswitch
+from Code_switch.app import main as run_codeswitch
 from ImageRAG.app import main as run_imagerag  # Import the main function from ImageRAG
+import subprocess
+import os
+import time
 
 st.set_page_config(
     page_title="Combined App",
@@ -46,6 +49,36 @@ def home_page():
     # Add separator
     st.markdown("---")
 
+def run_flask():
+    """Run the Flask application."""
+    flask_app_dir = os.path.join(os.getcwd(), "etl_job_rationalization")
+    
+    # Ensure the directory exists
+    if not os.path.exists(flask_app_dir):
+        raise NotADirectoryError(f"Directory does not exist: {flask_app_dir}")
+    
+    # Start the Flask app as a subprocess with the same command used previously
+    flask_process = subprocess.Popen(
+        ["flask", "run", "--host=0.0.0.0", "--port=3001"],
+        cwd=flask_app_dir,
+        shell=True,
+        env={"FLASK_APP": "app.py", **os.environ}  # Set FLASK_APP and preserve other environment variables
+    )
+    
+    # Allow time for the Flask server to start
+    time.sleep(5)
+    
+    # Provide a link to the Flask app in Streamlit
+    st.markdown("""
+        ### Flask Application
+        The Flask application is running. You can access it at:
+        [http://localhost:3001](http://localhost:3001)
+    """)
+    
+    # Optionally return the process for later management
+    return flask_process
+
+
 def main():
     # Sidebar configuration
     st.sidebar.title("Task Panel")
@@ -53,7 +86,7 @@ def main():
     # Navigation options
     app_choice = st.sidebar.radio(
         "Choose Application",
-        ["Home", "BRD Test Master", "Code Switch", "Image RAG"]
+        ["Home", "BRD Test Master", "Code Switch", "Image RAG", "Flask App"]
     )
     
     # Main content area
@@ -65,6 +98,9 @@ def main():
         run_codeswitch()
     elif app_choice == "Image RAG":
         run_imagerag()  # Run the ImageRAG application
+    elif app_choice == "ETL Job Rationalisation":
+        flask_process = run_flask()
+        # Optionally handle process cleanup when app exits
     
     # Footer
     # st.sidebar.markdown("---")
