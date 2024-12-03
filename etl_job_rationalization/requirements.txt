@@ -1,8 +1,0 @@
-pandas
-flask
-scikit-learn
-matplotlib
-seaborn
-openpyxl
-yellowbrick
-plotly
