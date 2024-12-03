@@ -45,3 +45,12 @@ streamlit
 boto3
 PyPDF
 colpali_engine
+
+pandas
+flask
+scikit-learn
+matplotlib
+seaborn
+openpyxl
+yellowbrick
+plotly
