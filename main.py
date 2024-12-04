@@ -54,6 +54,9 @@ def home_page():
 def run_flask():
     """Run the Flask application."""
     flask_app_dir = os.path.abspath("etl_job_rationalization")
+    if not os.path.exists(flask_app_dir):
+        st.error(f"Directory does not exist: {flask_app_dir}")
+
     
     # Ensure the directory exists
     if not os.path.exists(flask_app_dir):
