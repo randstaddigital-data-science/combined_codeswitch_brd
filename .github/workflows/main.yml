@@ -55,11 +55,11 @@ jobs:
       - name: Sync GitHub code to EC2
         run: |
           # Create app directory if it doesn't exist
-          mkdir -p /home/ubuntu/combined_codeswitch_brd
+          mkdir -p /home/ubuntu/combined_pocs
           
           # Copy new code to app directory
-          cp -r ./* /home/ubuntu/combined_codeswitch_brd/
+          cp -r ./* /home/ubuntu/combined_pocs/
           
           # Set proper permissions
-          sudo chown -R ubuntu:ubuntu /home/ubuntu/combined_codeswitch_brd
-          sudo chmod -R 755 /home/ubuntu/combined_codeswitch_brd
+          sudo chown -R ubuntu:ubuntu /home/ubuntu/combined_pocs
+          sudo chmod -R 755 /home/ubuntu/combined_pocs
