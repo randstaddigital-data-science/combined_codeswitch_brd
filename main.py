@@ -56,27 +56,27 @@ def run_flask():
     flask_app_dir = os.path.abspath("etl_job_rationalization")
     if not os.path.exists(flask_app_dir):
         st.error(f"Directory does not exist: {flask_app_dir}")
-
-    
-    # Ensure the directory exists
-    if not os.path.exists(flask_app_dir):
-        st.error(f"Directory does not exist: {flask_app_dir}")
         return
+
+    env_vars = os.environ.copy()
+    env_vars["FLASK_APP"] = os.path.join(flask_app_dir, "app.py")
 
     try:
         flask_process = subprocess.Popen(
             ["flask", "run", "--host=0.0.0.0", "--port=8080"],
             cwd=flask_app_dir,
-            shell=True,
-            env={"FLASK_APP": "app.py", **os.environ},
+            env=env_vars,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
         )
 
-        # Increase the timeout period
-        time.sleep(15)
+        # Wait for the Flask server to start
+        for _ in range(30):  # Check for up to 30 seconds
+            if flask_process.poll() is None:
+                time.sleep(1)
+            else:
+                break
 
-        # Check if Flask is running
         if flask_process.poll() is None:
             st.success("Flask application is running.")
             st.markdown("""
@@ -87,11 +87,8 @@ def run_flask():
         else:
             stderr = flask_process.stderr.read().decode()
             st.error(f"Flask application failed to start. Error: {stderr}")
-    except subprocess.TimeoutExpired:
-        st.error("Flask application took too long to start.")
     except Exception as e:
         st.error(f"An error occurred: {str(e)}")
-
 
 def etl_job_page():
     """Display the ETL Job Rationalisation page."""
