@@ -61,7 +61,6 @@ def run_flask():
         return
 
     try:
-        # Start Flask as a background process
         flask_process = subprocess.Popen(
             ["flask", "run", "--host=0.0.0.0", "--port=9090"],
             cwd=flask_app_dir,
@@ -71,9 +70,8 @@ def run_flask():
             stderr=subprocess.PIPE
         )
 
-        # Provide immediate feedback while Flask starts
-        st.info("Starting Flask application... Please wait.")
-        time.sleep(5)  # Allow time for Flask to start
+        # Increase the timeout period
+        time.sleep(15)
 
         # Check if Flask is running
         if flask_process.poll() is None:
@@ -86,8 +84,11 @@ def run_flask():
         else:
             stderr = flask_process.stderr.read().decode()
             st.error(f"Flask application failed to start. Error: {stderr}")
+    except subprocess.TimeoutExpired:
+        st.error("Flask application took too long to start.")
     except Exception as e:
         st.error(f"An error occurred: {str(e)}")
+
 
 def etl_job_page():
     """Display the ETL Job Rationalisation page."""
