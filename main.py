@@ -6,12 +6,14 @@ import subprocess
 import os
 import time
 
+# Streamlit Page Configuration
 st.set_page_config(
     page_title="Combined App",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
+# Home Page Function
 def home_page():
     st.title("Welcome to the Gen AI-Powered Platform")
     
@@ -51,34 +53,53 @@ def home_page():
 
 def run_flask():
     """Run the Flask application."""
-    flask_app_dir = os.path.join(os.getcwd(), "etl_job_rationalization")
+    flask_app_dir = os.path.abspath("etl_job_rationalization")
     
     # Ensure the directory exists
     if not os.path.exists(flask_app_dir):
-        raise NotADirectoryError(f"Directory does not exist: {flask_app_dir}")
-    
-    # Start the Flask app as a subprocess with the same command used previously
-    flask_process = subprocess.Popen(
-        ["flask", "run", "--host=0.0.0.0", "--port=3001"],
-        cwd=flask_app_dir,
-        shell=True,
-        env={"FLASK_APP": "app.py", **os.environ}  # Set FLASK_APP and preserve other environment variables
-    )
-    
-    # Allow time for the Flask server to start
-    time.sleep(5)
-    
-    # Provide a link to the Flask app in Streamlit
+        st.error(f"Directory does not exist: {flask_app_dir}")
+        return
+
+    try:
+        # Start Flask as a background process
+        flask_process = subprocess.Popen(
+            ["flask", "run", "--host=0.0.0.0", "--port=9090"],
+            cwd=flask_app_dir,
+            shell=True,
+            env={"FLASK_APP": "app.py", **os.environ},
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
+
+        # Provide immediate feedback while Flask starts
+        st.info("Starting Flask application... Please wait.")
+        time.sleep(5)  # Allow time for Flask to start
+
+        # Check if Flask is running
+        if flask_process.poll() is None:
+            st.success("Flask application is running.")
+            st.markdown("""
+                ### Flask Application
+                The Flask application is running. Access it here:
+                [http://localhost:9090](http://localhost:9090)
+            """)
+        else:
+            stderr = flask_process.stderr.read().decode()
+            st.error(f"Flask application failed to start. Error: {stderr}")
+    except Exception as e:
+        st.error(f"An error occurred: {str(e)}")
+
+def etl_job_page():
+    """Display the ETL Job Rationalisation page."""
+    st.title("ETL Job Rationalisation")
     st.markdown("""
-        ### Flask Application
-        The Flask application is running. You can access it at:
-        [http://localhost:3001](http://localhost:3001)
+        This page will start the ETL Job Rationalisation Flask application and provide access once it's running.
     """)
-    
-    # Optionally return the process for later management
-    return flask_process
 
+    # Trigger Flask start
+    run_flask()
 
+# Main Function
 def main():
     # Sidebar configuration
     st.sidebar.title("Task Panel")
@@ -86,7 +107,7 @@ def main():
     # Navigation options
     app_choice = st.sidebar.radio(
         "Choose Application",
-        ["Home", "BRD Test Master", "Code Switch", "Image RAG", "Flask App"]
+        ["Home", "BRD Test Master", "Code Switch", "Image RAG", "ETL Job Rationalisation"]
     )
     
     # Main content area
@@ -99,12 +120,8 @@ def main():
     elif app_choice == "Image RAG":
         run_imagerag()  # Run the ImageRAG application
     elif app_choice == "ETL Job Rationalisation":
-        flask_process = run_flask()
-        # Optionally handle process cleanup when app exits
-    
-    # Footer
-    # st.sidebar.markdown("---")
-    # st.sidebar.markdown("© 2024 Multi-Tool Platform")
+        etl_job_page()  # Display the ETL Job Rationalisation page
 
+# Run the App
 if __name__ == "__main__":
     main()
