@@ -2,6 +2,7 @@ import streamlit as st
 from brd_master.app import run as run_brd
 from code_switch.app import main as run_codeswitch
 from ImageRAG.app import main as run_imagerag  # Import the main function from ImageRAG
+from etl_job_rationalization.app import etl_rationalization_main  # Import the ETL function
 import subprocess
 import os
 import time
@@ -51,67 +52,13 @@ def home_page():
     # Add separator
     st.markdown("---")
 
-def run_flask():
-    """Run the Flask application."""
-    flask_app_dir = os.path.abspath("etl_job_rationalization")
-    if not os.path.exists(flask_app_dir):
-        st.error(f"Directory does not exist: {flask_app_dir}")
-        return
-
-    env_vars = os.environ.copy()
-    env_vars["FLASK_APP"] = os.path.join(flask_app_dir, "app.py")
-
-    try:
-        flask_process = subprocess.Popen(
-            ["flask", "run", "--host=0.0.0.0", "--port=8080"],
-            cwd=flask_app_dir,
-            env=env_vars,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
-        )
-
-        # Wait for the Flask server to start
-        for _ in range(30):  # Check for up to 30 seconds
-            if flask_process.poll() is None:
-                time.sleep(1)
-            else:
-                break
-
-        if flask_process.poll() is None:
-            st.success("Flask application is running.")
-            st.markdown("""
-                ### Flask Application
-                The Flask application is running. Access it here:
-                [http://localhost:8080](http://localhost:8080)
-            """)
-        else:
-            stderr = flask_process.stderr.read().decode()
-            st.error(f"Flask application failed to start. Error: {stderr}")
-    except Exception as e:
-        st.error(f"An error occurred: {str(e)}")
-
-def etl_job_page():
-    """Display the ETL Job Rationalisation page."""
-    st.title("ETL Job Rationalisation")
-    st.markdown("""
-        This page will start the ETL Job Rationalisation Flask application and provide access once it's running.
-    """)
-
-    # Trigger Flask start
-    run_flask()
-
-# Main Function
 def main():
-    # Sidebar configuration
     st.sidebar.title("Task Panel")
-    
-    # Navigation options
     app_choice = st.sidebar.radio(
         "Choose Application",
         ["Home", "BRD Test Master", "Code Switch", "Image RAG", "ETL Job Rationalisation"]
     )
-    
-    # Main content area
+
     if app_choice == "Home":
         home_page()
     elif app_choice == "BRD Test Master":
@@ -119,10 +66,9 @@ def main():
     elif app_choice == "Code Switch":
         run_codeswitch()
     elif app_choice == "Image RAG":
-        run_imagerag()  # Run the ImageRAG application
+        run_imagerag()
     elif app_choice == "ETL Job Rationalisation":
-        etl_job_page()  # Display the ETL Job Rationalisation page
+        etl_rationalization_main()  # Call the ETL logic
 
-# Run the App
 if __name__ == "__main__":
     main()
