@@ -62,7 +62,7 @@ def run_flask():
 
     try:
         flask_process = subprocess.Popen(
-            ["flask", "run", "--host=0.0.0.0", "--port=9090"],
+            ["flask", "run", "--host=0.0.0.0", "--port=8080"],
             cwd=flask_app_dir,
             shell=True,
             env={"FLASK_APP": "app.py", **os.environ},
@@ -79,7 +79,7 @@ def run_flask():
             st.markdown("""
                 ### Flask Application
                 The Flask application is running. Access it here:
-                [http://localhost:9090](http://localhost:9090)
+                [http://localhost:8080](http://localhost:8080)
             """)
         else:
             stderr = flask_process.stderr.read().decode()
