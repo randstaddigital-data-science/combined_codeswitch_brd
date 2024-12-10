@@ -1,8 +1,9 @@
 import streamlit as st
 from brd_master.app import run as run_brd
 from code_switch.app import main as run_codeswitch
-from ImageRAG.app import main as run_imagerag  # Import the main function from ImageRAG
-from etl_job_rationalization.app import etl_rationalization_main  # Import the ETL function
+from ImageRAG.app import main as run_imagerag
+from etl_job_rationalization.app import etl_rationalization_main
+from resumemapping.main import resume_mapping
 import subprocess
 import os
 import time
@@ -32,31 +33,33 @@ def home_page():
         <h3 style="margin-top: 20px;">Supercharge Your Development with Gen AI</h3>
 
         Welcome to the future of development! Our Gen AI Powered Development Kit is designed to help you streamline workflows,
-        boost efficiency, and achieve more with less effort. Using the latest in Large Language Model (LLM) technology, we've crafted three 
+        boost efficiency, and achieve more with less effort. Using the latest in Large Language Model (LLM) technology, we've crafted several 
         powerful tools to transform how you handle business requirements, code, and image-based document analysis.
 
         Meet Your New Tools:
                         
-        📝 BRD Test Case Generator
-        - Effortlessly generate precise test cases from your Business Requirement Documents (BRDs).
-        - Say goodbye to manual work and hello to more time for innovation!
+        📝 BRD Test Case Generator  
+        - Effortlessly generate precise test cases from your Business Requirement Documents (BRDs).  
                         
-        💻 Code Conversion Engine
-        - Instantly convert code between different programming languages. 
-        - Whether you're working across platforms or modernizing legacy systems, this tool will save you hours of tedious re-coding.
+        💻 Code Conversion Engine  
+        - Instantly convert code between different programming languages.  
 
-        📄 PDF Analysis with RAG and Claude
-        - Analyze PDFs and answer queries with image and text context using cutting-edge Retrieval-Augmented Generation technology.
+        📄 PDF Analysis with RAG and Claude  
+        - Analyze PDFs and answer queries with image and text context using cutting-edge Retrieval-Augmented Generation technology.  
+
+        📋 Resume Mapping  
+        - Match job descriptions with resumes using AWS Bedrock and advanced embeddings.
         """, unsafe_allow_html=True)
     
     # Add separator
     st.markdown("---")
 
+# Main Function
 def main():
     st.sidebar.title("Task Panel")
     app_choice = st.sidebar.radio(
         "Choose Application",
-        ["Home", "BRD Test Master", "Code Switch", "Image RAG", "ETL Job Rationalisation"]
+        ["Home", "BRD Test Master", "Code Switch", "Image RAG", "ETL Job Rationalisation", "Resume Mapping"]
     )
 
     if app_choice == "Home":
@@ -68,7 +71,9 @@ def main():
     elif app_choice == "Image RAG":
         run_imagerag()
     elif app_choice == "ETL Job Rationalisation":
-        etl_rationalization_main()  # Call the ETL logic
+        etl_rationalization_main()
+    elif app_choice == "Resume Mapping":
+        resume_mapping()
 
 if __name__ == "__main__":
     main()
