@@ -3,7 +3,7 @@ from brd_master.app import run as run_brd
 from code_switch.app import main as run_codeswitch
 from ImageRAG.app import main as run_imagerag
 from etl_job_rationalization.app import etl_rationalization_main
-from resumemapping.main import resume_mapping
+from resume_mapping.main import resume_mapping
 import subprocess
 import os
 import time
